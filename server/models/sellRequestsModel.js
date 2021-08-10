@@ -4,8 +4,6 @@ import extendSchema from 'mongoose-extend-schema';
 
 import requestSchema from './requestSchema';
 
-// import { isEmpty } from "../utils.js";
-
 const sellRequestSchema = extendSchema(requestSchema, {
 	requestType: {
 		type: String,
