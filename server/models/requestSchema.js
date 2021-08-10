@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import isEmpty from '../utils';
+import { isEmpty } from '../utils';
 
 const requestSchema = mongoose.Schema({
 	model: {
