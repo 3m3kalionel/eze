@@ -98,6 +98,79 @@ const saveSheetsDataToCollections = async (req, res) => {
 	}
 };
 
+const searchProducts = async (req, res) => {
+	const pipeline = [
+		{
+			'$lookup': {
+				'from': 'buyrequests',
+				'pipeline': [
+					{
+						'$match': {
+							'$text': {
+								'$search': '\"iPhone6\"'
+							},
+						}
+					}
+				],
+				'as': 'buys'
+			}
+		}, {
+			'$lookup': {
+				'from': 'sellrequests',
+				'pipeline': [
+					{
+						'$match': {
+							'$text': {
+								'$search': 'C/D'
+							}
+						}
+					}
+				],
+				'as': 'sells'
+			}
+		}, {
+			'$limit': 1
+		}, {
+			'$project': {
+				'buys': 1,
+				'sells': 1,
+				'_id': 0
+			}
+		}, {
+			'$addFields': {
+				'match': {
+					'$concatArrays': [
+						'$buys', '$sells'
+					]
+				}
+			}
+		}, {
+			'$project': {
+				'match': 1
+			}
+		}, {
+			'$unwind': {
+				'path': '$match',
+				'preserveNullAndEmptyArrays': true
+			}
+		},
+		{ '$sort': { "match.price": 1 } },
+		{ '$skip': 0 },
+		{
+			'$limit': 20
+		}
+	]
+	const results = await buyRequestModel.aggregate(
+		pipeline
+	);
+
+	res.status(200).json({
+		message: 'status: ok',
+		results,
+	});
+}
+
 export default {
 	saveSheetsDataToCollections,
+	searchProducts
 };
